@@ -71,8 +71,8 @@ Liste_joueur = {
     7:PlayerId.SEVEN,
     8:PlayerId.EIGHT
 }
-input_path = "C:\\Users\\redma\\Games\\Age of Empires 2 DE\\76561198382316787\\resources\\_common\\scenario\\test_trigger.aoe2scenario"
-output_path = "C:\\Users\\redma\\Games\\Age of Empires 2 DE\\76561198382316787\\resources\\_common\\scenario\\test_trigger.aoe2scenario"
+input_path = "CHANGE PATH HERE"
+output_path = "CHANGE PATH HERE"
 
 
 
