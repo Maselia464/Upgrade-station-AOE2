@@ -24,3 +24,5 @@ BE WARNED ! This current version has "no way" to remove the trigger, every time 
 You can modify stats and tech effect in the Upgrade_station_dictionnary.py
 
 but do not touch the unused resource you will break the mod...
+
+You are completely free to use this code and modify for your own need, just credit me, it's not much but it's help ;)
