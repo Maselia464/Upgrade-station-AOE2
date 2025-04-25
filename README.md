@@ -2,6 +2,14 @@ Hello
 
 This github is dedicated to the mod upgrade station on Age of empire 02
 This is a script you have to execute to add the triggers into your scenario
+Version 0-2
+
+- Added the demonic technologie, available at town-center, playe rcan research it, they get a great bonus at the cost of fighting a boss or loosing a type of unit
+- Each demon tech are available during a specific age...
+- Added reward after killing a x number of units, player either get resource of tickets to exchange for resource
+- Fix, rams getting more projectile
+- Fix, ram getting ranged attack from tech
+
 
 Version 0.1
 
