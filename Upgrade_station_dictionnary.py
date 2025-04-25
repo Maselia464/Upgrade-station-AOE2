@@ -1,7 +1,11 @@
 #Ceci est le dictionnaire de la station d'amélioration,
 from email.headerregistry import UniqueUnstructuredHeader
 
+from AoE2ScenarioParser.datasets.heroes import HeroInfo
+from AoE2ScenarioParser.datasets.techs import TechInfo
 from AoE2ScenarioParser.datasets.trigger_lists import Attribute
+from AoE2ScenarioParser.datasets.units import UnitInfo
+from pandas.core.common import not_none
 
 food = 0
 wood = 1
@@ -12,6 +16,8 @@ special_case_2 = 3
 special_case_3 = 4
 special_case_4 = 5
 special_case_5 =6
+special_case_6 = 7
+special_case_7 = 8
 technologie_page_desc_icon = { #Ce dictionnaire est pour les tech qui font office d'ouverture de page, première élément les icônes; deuxièmes les descriptions
     1:[53,"Open the infantry upgrades and allow you to upgrade infantry units"],
     2:[45,"Open the cavalry upgrades and allow you to upgrade cavalry units"],
@@ -115,6 +121,41 @@ Techno_xs = {
       
     "}}"
         ),
+107: ("void Script_XS_{s}_{u}_{player}() {{"  # SPECIAL CASE 6
+          "xsEffectAmount({operateur}, {unit_ID}, {attribute}, {valeur_XS}, {player});"
+          "xsEffectAmount({operateur}, {unit_ID_2}, {attribute}, {valeur_XS_2}, {player});"
+          "xsEffectAmount({operateur}, {unit_ID_3}, {attribute}, {valeur_XS_3}, {player});"
+      
+          "xsEffectAmount({operateur_2}, {unit_ID_4}, {attribute}, {valeur_XS_4}, {player});"
+          "xsEffectAmount({operateur_2}, {unit_ID_5}, {attribute}, {valeur_XS_4}, {player});"
+        "xsEffectAmount({operateur_2}, {unit_ID_6}, {attribute}, {valeur_XS_4}, {player});"
+
+          "xsEffectAmount({operateur}, {unit_ID}, {attribute_2}, {valeur_XS}, {player});"
+          "xsEffectAmount({operateur}, {unit_ID_2}, {attribute_2}, {valeur_XS_2}, {player});"
+          "xsEffectAmount({operateur}, {unit_ID_3}, {attribute_2}, {valeur_XS_3}, {player});"
+      
+          "xsEffectAmount({operateur_2}, {unit_ID_4}, {attribute_2}, {valeur_XS_4}, {player});"
+        "xsEffectAmount({operateur_2}, {unit_ID_5}, {attribute_2}, {valeur_XS_4}, {player});"
+        "xsEffectAmount({operateur_2}, {unit_ID_6}, {attribute_2}, {valeur_XS_4}, {player});"
+      
+         "xsEffectAmount({operateur}, {unit_ID_4}, {attribute_3}, {valeur_XS_5}, {player});"
+      "xsEffectAmount({operateur}, {unit_ID_5}, {attribute_3}, {valeur_XS_5}, {player});"
+      "xsEffectAmount({operateur}, {unit_ID_6}, {attribute_3}, {valeur_XS_5}, {player});"
+          "}}"),
+108: ("void Script_XS_{s}_{u}_{player}() {{" #SPECIAL CASE 2
+        "xsEffectAmount({operateur}, {unit_ID}, {attribute}, {valeur_XS}, {player});"
+        "xsEffectAmount({operateur}, {unit_ID_2}, {attribute}, {valeur_XS}, {player});"
+        "xsEffectAmount({operateur}, {unit_ID_3}, {attribute}, {valeur_XS}, {player});"
+      
+        "xsEffectAmount({operateur_2}, {unit_ID_4}, {attribute}, {valeur_XS_4}, {player});"
+        "xsEffectAmount({operateur_2}, {unit_ID_5}, {attribute}, {valeur_XS_4}, {player});"
+       "xsEffectAmount({operateur_2}, {unit_ID_6}, {attribute}, {valeur_XS_4}, {player});"
+      
+      "xsEffectAmount({operateur}, {unit_ID_4}, {attribute_2}, {valeur_XS_5}, {player});"
+        "xsEffectAmount({operateur}, {unit_ID_5}, {attribute_2}, {valeur_XS_5}, {player});"
+       "xsEffectAmount({operateur}, {unit_ID_6}, {attribute_2}, {valeur_XS_5}, {player});"
+    "}}"
+        ),
 #["cAddAttribute",904,,,],
 #Amélioration infantrie
     1: ["cAddAttribute",906,9,"256*4 + 3",False], #Infantrie attaque upgrade
@@ -146,9 +187,9 @@ Techno_xs = {
     24:["cMulAttribute",913,10,0.85,special_case,954,0.85,955,0.85],#Vitesse d'attaque
     25:["cMulAttribute",913,5,1.15,special_case,42,1.15,955,1.15], #Vitesse de déplacement
     26:["cMulAttribute",42,13,1.15,False], #Vitesse de déploiement
-    27:["cAddAttribute",913,12,1,special_case,954,1,955,1], #Portée
+    27:["cAddAttribute",913,12,1,special_case_7,954,1,955,1,1258,422,548,"cSetAttribute",0,8,"256*4 + 1"], #Portée et armure belier
     28:["cMulAttribute",913,22,1.10,special_case,954,1.10,955,1.10],#Radius
-    29:["cAddAttribute",913,102,1,special_case_2,954,1,955,1,107],#Nombre missile
+    29:["cAddAttribute",913,102,1,special_case_6,954,1,955,1,107,1258,422,548,0,0,300,"cSetAttribute"],#Nombre missile
     30:["cMulAttribute",913,101,0.10,special_case,42,0.10,955,0.10], #Vitesse de construction
 #Eco tech
     31: ["cMulAttribute", 904, 13, 1.15, False], #Vitesse de collecte et de construction
@@ -203,4 +244,126 @@ Techno_message= {
 35: "Upgrade population headroom <cost>\n You gain +50 population headroom.\nYou can make this upgrade 3 times.",
 36: "Upgrade relic gold generation <cost>\nYour relics gold production is doubled, also the first time you reserach this, you unlock the possibility to create relics inside monastery.\nYou can make this upgrade 3 times."
 #37:
+}
+###########################################################################################################################################################################################################################################
+#
+#
+#
+#
+#
+#                                                                   Séparation, la suite c'est le TRADE WORKSHOP
+#                                                                   Separation, next part is the TRADE WORKSHOP
+#
+#
+#
+#
+#
+###########################################################################################################################################################################################################################################
+
+Trade_workshop_placeholder_tech = {
+    1:[TechInfo.TECHNOLOGY_PLACEHOLDER_01.ID,"Exchange a point for 500 food.\nYou gain points by killing enemy units or waiting...\nPoints are displayed in the objective tab",124],
+    2:[TechInfo.TECHNOLOGY_PLACEHOLDER_02.ID,"Exchange a point for 500 wood.\nYou gain points by killing enemy units or waiting...\nPoints are displayed in the objective tab",70],
+    3:[TechInfo.TECHNOLOGY_PLACEHOLDER_03.ID,"Exchange a point for 500 gold.\nYou gain points by killing enemy units or waiting...\nPoints are displayed in the objective tab",3],
+    4:[TechInfo.TECHNOLOGY_PLACEHOLDER_04.ID,"Exchange a point for 500 stone.\nYou gain points by killing enemy units or waiting...\nPoints are displayed in the objective tab",88],
+    5:[TechInfo.TECHNOLOGY_PLACEHOLDER_05.ID,"Upgrade the trade workshop to tier 2 <cost>.\nYou gain points by killing enemy units or waiting...\nPoints are displayed in the objective tab",105],
+}
+
+Trigger_Trade_workshop = {
+    1:["Exchange 1 ticket for 500 food {player}",0,1,Attribute.UNUSED_RESOURCE_121,food,500,TechInfo.TECHNOLOGY_PLACEHOLDER_01.ID],
+    2:["Exchange 1 tickets for 500 wood {player}",0,1,Attribute.UNUSED_RESOURCE_121,wood,500,TechInfo.TECHNOLOGY_PLACEHOLDER_02.ID],
+    3:["Exchange 1 tickets for 500 gold {player}",0,1,Attribute.UNUSED_RESOURCE_121,gold,500,TechInfo.TECHNOLOGY_PLACEHOLDER_03.ID],
+    4:["Exchange 1 tickets for 500 stone {player}",0,1,Attribute.UNUSED_RESOURCE_121,stone,500,TechInfo.TECHNOLOGY_PLACEHOLDER_04.ID],
+    5: ["Exchange 1 ticket for 1000 food {player}", 1,2, Attribute.UNUSED_RESOURCE_121, food, 1000,TechInfo.TECHNOLOGY_PLACEHOLDER_01.ID],
+    6: ["Exchange 1 tickets for 1000 wood {player}", 1,2, Attribute.UNUSED_RESOURCE_121, wood, 1000,TechInfo.TECHNOLOGY_PLACEHOLDER_02.ID],
+    7: ["Exchange 1 tickets for 1000 gold {player}", 1,2, Attribute.UNUSED_RESOURCE_121, gold, 1000,TechInfo.TECHNOLOGY_PLACEHOLDER_03.ID],
+    8: ["Exchange 1 tickets for 1000 stone {player}", 1, 2, Attribute.UNUSED_RESOURCE_121, stone, 1000,TechInfo.TECHNOLOGY_PLACEHOLDER_04.ID],
+    9: ["Exchange 1 ticket for 1500 food {player}", 2, 3, Attribute.UNUSED_RESOURCE_121, food, 1500,TechInfo.TECHNOLOGY_PLACEHOLDER_01.ID],
+    10: ["Exchange 1 tickets for 1500 wood {player}", 2, 3, Attribute.UNUSED_RESOURCE_121, wood, 1500,TechInfo.TECHNOLOGY_PLACEHOLDER_02.ID],
+    11: ["Exchange 1 tickets for 1500 gold {player}", 2, 3, Attribute.UNUSED_RESOURCE_121, gold, 1500,TechInfo.TECHNOLOGY_PLACEHOLDER_03.ID],
+    12: ["Exchange 1 tickets for 1500 stone {player}", 2, 3, Attribute.UNUSED_RESOURCE_121, stone, 1500,TechInfo.TECHNOLOGY_PLACEHOLDER_04.ID],
+    13: ["Exchange 1 ticket for 2500 food {player}", 3, 4, Attribute.UNUSED_RESOURCE_121, food, 2500,TechInfo.TECHNOLOGY_PLACEHOLDER_01.ID],
+    14: ["Exchange 1 tickets for 2500 wood {player}", 3, 4, Attribute.UNUSED_RESOURCE_121, wood, 2500,TechInfo.TECHNOLOGY_PLACEHOLDER_02.ID],
+    15: ["Exchange 1 tickets for 2500 gold {player}", 3, 4, Attribute.UNUSED_RESOURCE_121, gold, 2500,TechInfo.TECHNOLOGY_PLACEHOLDER_03.ID],
+    16: ["Exchange 1 tickets for 2500 stone {player}", 3, 4, Attribute.UNUSED_RESOURCE_121, stone, 2500,TechInfo.TECHNOLOGY_PLACEHOLDER_04.ID],
+    17: ["Exchange 1 ticket for 4000 food {player}", 4, 5, Attribute.UNUSED_RESOURCE_121, food, 4000,TechInfo.TECHNOLOGY_PLACEHOLDER_01.ID],
+    18: ["Exchange 1 tickets for 4000 wood {player}", 4, 5, Attribute.UNUSED_RESOURCE_121, wood, 4000,TechInfo.TECHNOLOGY_PLACEHOLDER_02.ID],
+    19: ["Exchange 1 tickets for 4000 gold {player}", 4, 5, Attribute.UNUSED_RESOURCE_121, gold, 4000,TechInfo.TECHNOLOGY_PLACEHOLDER_03.ID],
+    20: ["Exchange 1 tickets for 4000 stone {player}", 4, 5, Attribute.UNUSED_RESOURCE_121, stone, 4000,TechInfo.TECHNOLOGY_PLACEHOLDER_04.ID],
+    21: ["Exchange 1 ticket for 6000 food {player}", 5, 6, Attribute.UNUSED_RESOURCE_121, food, 6000,TechInfo.TECHNOLOGY_PLACEHOLDER_01.ID],
+    22: ["Exchange 1 tickets for 6000 wood {player}", 5, 6, Attribute.UNUSED_RESOURCE_121, wood, 6000,TechInfo.TECHNOLOGY_PLACEHOLDER_02.ID],
+    23: ["Exchange 1 tickets for 6000 gold {player}", 5, 6, Attribute.UNUSED_RESOURCE_121, gold, 6000,TechInfo.TECHNOLOGY_PLACEHOLDER_03.ID],
+    24: ["Exchange 1 tickets for 6000 stone {player}", 5, 6, Attribute.UNUSED_RESOURCE_121, stone, 6000,TechInfo.TECHNOLOGY_PLACEHOLDER_04.ID],
+}
+Trigger_Trade_workshop_upgrade = {
+    1:["Upgrade trade workshop {player}",Attribute.UNUSED_RESOURCE_121,0,1],
+    2:["Upgrade trade workshop {player}",Attribute.UNUSED_RESOURCE_121,1,2],
+    3:["Upgrade trade workshop {player}",Attribute.UNUSED_RESOURCE_121,2,3],
+    4:["Upgrade trade workshop {player}",Attribute.UNUSED_RESOURCE_121,3,4],
+    5:["Upgrade trade workshop {player}",Attribute.UNUSED_RESOURCE_121,4,5],
+}
+
+
+Trade_workshop_upgrade_msg = {
+    1:[TechInfo.TECHNOLOGY_PLACEHOLDER_01.ID,"Exchange a point for 1000 food.\nYou gain points by killing enemy units or waiting...\nPoints are displayed in the objective tab"],
+    2:[TechInfo.TECHNOLOGY_PLACEHOLDER_02.ID,"Exchange a point for 1000 wood.\nYou gain points by killing enemy units or waiting...\nPoints are displayed in the objective tab"],
+    3:[TechInfo.TECHNOLOGY_PLACEHOLDER_03.ID,"Exchange a point for 1000 gold.\nYou gain points by killing enemy units or waiting...\nPoints are displayed in the objective tab"],
+    4:[TechInfo.TECHNOLOGY_PLACEHOLDER_04.ID,"Exchange a point for 1000 stone.\nYou gain points by killing enemy units or waiting...\nPoints are displayed in the objective tab"],
+    5:[TechInfo.TECHNOLOGY_PLACEHOLDER_05.ID,"Upgrade the trade workshop to tier 3 <cost>.\nExchanging a point will now give you 1500 resource...",food,7500,gold,6500,None,None],
+    6: [TechInfo.TECHNOLOGY_PLACEHOLDER_01.ID,"Exchange a point for 1500 food.\nYou gain points by killing enemy units or waiting...\nPoints are displayed in the objective tab"],
+    7: [TechInfo.TECHNOLOGY_PLACEHOLDER_02.ID,"Exchange a point for 1500 wood.\nYou gain points by killing enemy units or waiting...\nPoints are displayed in the objective tab"],
+    8: [TechInfo.TECHNOLOGY_PLACEHOLDER_03.ID,"Exchange a point for 1500 gold.\nYou gain points by killing enemy units or waiting...\nPoints are displayed in the objective tab"],
+    9: [TechInfo.TECHNOLOGY_PLACEHOLDER_04.ID,"Exchange a point for 1500 stone.\nYou gain points by killing enemy units or waiting...\nPoints are displayed in the objective tab"],
+    10: [TechInfo.TECHNOLOGY_PLACEHOLDER_05.ID,"Upgrade the trade workshop to tier 4 <cost>.\nExchanging a point will now give you 2500 resource...\nAlso you will gain points every 3 minutes instead of 3:30 minutes",food,12000,gold,10000,None,None],
+    11: [TechInfo.TECHNOLOGY_PLACEHOLDER_01.ID,"Exchange a point for 2500 food.\nYou gain points by killing enemy units or waiting...\nPoints are displayed in the objective tab"],
+    12: [TechInfo.TECHNOLOGY_PLACEHOLDER_02.ID,"Exchange a point for 2500 wood.\nYou gain points by killing enemy units or waiting...\nPoints are displayed in the objective tab"],
+    13: [TechInfo.TECHNOLOGY_PLACEHOLDER_03.ID,"Exchange a point for 2500 gold.\nYou gain points by killing enemy units or waiting...\nPoints are displayed in the objective tab"],
+    14: [TechInfo.TECHNOLOGY_PLACEHOLDER_04.ID,"Exchange a point for 2500 stone.\nYou gain points by killing enemy units or waiting...\nPoints are displayed in the objective tab"],
+    15: [TechInfo.TECHNOLOGY_PLACEHOLDER_05.ID,"Upgrade the trade workshop to tier 5 <cost>.\nExchanging a point will now give you 4000 resource...",food,13000,wood,11000,stone,2000],
+    16: [TechInfo.TECHNOLOGY_PLACEHOLDER_01.ID,"Exchange a point for 4000 food.\nYou gain points by killing enemy units or waiting...\nPoints are displayed in the objective tab"],
+    17: [TechInfo.TECHNOLOGY_PLACEHOLDER_02.ID,"Exchange a point for 4000 wood.\nYou gain points by killing enemy units or waiting...\nPoints are displayed in the objective tab"],
+    18: [TechInfo.TECHNOLOGY_PLACEHOLDER_03.ID,"Exchange a point for 4000 gold.\nYou gain points by killing enemy units or waiting...\nPoints are displayed in the objective tab"],
+    19: [TechInfo.TECHNOLOGY_PLACEHOLDER_04.ID,"Exchange a point for 4000 stone.\nYou gain points by killing enemy units or waiting...\nPoints are displayed in the objective tab"],
+    20: [TechInfo.TECHNOLOGY_PLACEHOLDER_05.ID,"Upgrade the trade workshop to tier 6 <cost>.\nExchanging a point will now give you 6000 resource...\nAlso you will receive a ticket every 2:30 minutes instead of 3 minutes",food,15000,gold,16000,stone,7000],
+    21: [TechInfo.TECHNOLOGY_PLACEHOLDER_01.ID,"Exchange a point for 6000 food.\nYou gain points by killing enemy units or waiting...\nPoints are displayed in the objective tab"],
+    22: [TechInfo.TECHNOLOGY_PLACEHOLDER_02.ID,"Exchange a point for 6000 wood.\nYou gain points by killing enemy units or waiting...\nPoints are displayed in the objective tab"],
+    23: [TechInfo.TECHNOLOGY_PLACEHOLDER_03.ID,"Exchange a point for 6000 gold.\nYou gain points by killing enemy units or waiting...\nPoints are displayed in the objective tab"],
+    24: [TechInfo.TECHNOLOGY_PLACEHOLDER_04.ID,"Exchange a point for 6000 stone.\nYou gain points by killing enemy units or waiting...\nPoints are displayed in the objective tab"],
+    25: [TechInfo.TECHNOLOGY_PLACEHOLDER_05.ID,None,None,None,None,None,None,None],
+}
+
+Kill_reward = {
+    1: [200,350,  500,  600,  750,1000,1150,1350, 1500, 1750,2000,2250,2500, 2800,3000, 3500, 4000, 4500, 5000],# Nombre de kill
+    2: [300,500,False,False,650,700,False,1000,False,False,1000,1200,False,1500,1700,False,False,False,False], # food
+    3: [False,False,400,500,False,False,500,False,False,800,1100,False,1100,False,False,2000,2000,False,False], # wood
+    4: [300,300,  400,  550,  False, 900, 1000, False, False, False, False, 1200, False,1400, 1400, False, False, 1600, 1600], # stone
+    5: [150,150,200,250,500,False,800,900,False,1000, 1100, False, False, 1600, 1700, False, False, 1900, 2100], # gold
+    6: [False,False,False,False,1,False,1,1,5,False,False,2,2,False,3,False,5,False,10] # tickets
+}
+
+Demon_tech = {
+    1:["Fight me {player}",TechInfo.DARK_AGE.ID,TechInfo.FEUDAL_AGE.ID,HeroInfo.ZAWISZA_THE_BLACK.ID,food,450,wood,300,Attribute.UNUSED_RESOURCE_130,1,
+       "Town-center challenge <cost>\n You win another packed town-center but you must fight 10 enemies unit...",
+       "Town-center challenge <cost>. You gain a packed town-center, you fight 10 enemies units..."],
+    2:["Malay + Khmer {player}",TechInfo.FEUDAL_AGE.ID,TechInfo.CASTLE_AGE.ID,HeroInfo.ZAKARE.ID,None,None,None,None,Attribute.UNUSED_RESOURCE_131,1,
+       "Challenge of the car <cost>\n You win the farm bonus of the Khmers and the fast and upgrade of the Malay but you must fight the mighty cobra car",
+       "Challenge of the car <cost>. You win Khmer farming bonus and malay age upgrade, you fight a cobra car..."],
+    3:["You are FIRED {player}",TechInfo.CASTLE_AGE.ID,TechInfo.IMPERIAL_AGE.ID,HeroInfo.YURY.ID,food,5000,gold,3000,Attribute.UNUSED_RESOURCE_132,1,
+       "You are FIRED <cost>\n All your villager will gain triple collection and construction speed but they will all die...",
+       "You are FIRED <cost>.All villager triple gathering and building speed, they will all die too"],
+    4:["Woman vs CRYPTO {player}",TechInfo.IMPERIAL_AGE.ID,None,HeroInfo.YODIT.ID,None,None,None,None,Attribute.UNUSED_RESOURCE_133,1,
+       "Woman vs CRYPTO <cost>\n Your trade cart bring back 3 times more gold...\nHowever you have to fight Jagwiga and Tamar which are able to summon units",
+       "Woman vs CRYPTO <cost>. Trade cart bring back more gold... You must fight Jagwiga and Tamar"]
+}
+
+Boss_unit_spawn = {
+    1:[UnitInfo.HUSSAR.ID,UnitInfo.HEAVY_PIKEMAN.ID],
+    2:[UnitInfo.HUSSAR.ID,UnitInfo.HEAVY_PIKEMAN.ID],
+    3:[UnitInfo.HEAVY_CAVALRY_ARCHER.ID,UnitInfo.CAVALIER.ID],
+    4:[UnitInfo.HEAVY_CAVALRY_ARCHER.ID,UnitInfo.HEAVY_CAMEL_RIDER.ID],
+    5:[UnitInfo.ELITE_SKIRMISHER.ID,UnitInfo.ARAMBAI.ID],
+    6:[UnitInfo.ELITE_SKIRMISHER.ID,UnitInfo.ARAMBAI.ID],
+    7:[UnitInfo.HAND_CANNONEER.ID,UnitInfo.JANISSARY.ID],
+    8:[UnitInfo.CHAMPION.ID,UnitInfo.ELITE_EAGLE_WARRIOR.ID],
+    9:[UnitInfo.ELITE_WOAD_RAIDER.ID,UnitInfo.CHAMPION.ID],
+    10:[UnitInfo.ELITE_BERSERK.ID,UnitInfo.KONNIK_DISMOUNTED.ID],
 }
