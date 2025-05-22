@@ -385,6 +385,3 @@ Tower_upgrade_cost_desc = {
     5:[food,7000,wood,6500,"Research new resource study <cost>\n Watch towers lines and donjon have a stone cost set at 95",172]
 }
 
-Potion = {
-
-}
