@@ -2,6 +2,14 @@ Hello
 
 This github is dedicated to the mod upgrade station on Age of empire 02
 This is a script you have to execute to add the triggers into your scenario
+Version 0-3
+
+- Fix the issue where chinese civ had infinite upgrade and tickets because of their civ bonus.
+- Added the holy potion of steroid to buff units stat
+- Change LOS bonus to area of damage for cavalry
+- Added description for rams into te siege techs
+
+
 Version 0-2
 
 - Added the demonic technologie, available at town-center, playe rcan research it, they get a great bonus at the cost of fighting a boss or loosing a type of unit
