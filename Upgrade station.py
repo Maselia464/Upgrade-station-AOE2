@@ -70,7 +70,10 @@ from Upgrade_station_dictionnary import  Trigger_Trade_workshop_upgrade
 from Upgrade_station_dictionnary import  Demon_tech
 from Upgrade_station_dictionnary import  Kill_reward
 from Upgrade_station_dictionnary import  Boss_unit_spawn
+from Upgrade_station_dictionnary import  Tower_upgrade_stat
+from Upgrade_station_dictionnary import  Tower_upgrade_cost_desc
 from AoE2ScenarioParser.objects.support.area import Area
+
 
 Liste_joueur = {
     1: PlayerId.ONE,
@@ -82,15 +85,26 @@ Liste_joueur = {
     7:PlayerId.SEVEN,
     8:PlayerId.EIGHT
 }
-input_path = "C:\\Users\\redma\\Games\\Age of Empires 2 DE\\76561198382316787\\resources\\_common\\scenario\\test_trigger2.aoe2scenario"
-output_path = "C:\\Users\\redma\\Games\\Age of Empires 2 DE\\76561198382316787\\resources\\_common\\scenario\\test_trigger2_output.aoe2scenario"
+
+Lister_couleur = {
+    1: "BLUE",
+    2: "RED",
+    3: "GREEN",
+    4: "YELLOW",
+    5: "AQUA",
+    6: "PURPLE",
+    7: "GRAY",
+    8: "ORANGE",
+}
+input_path = "C:\\Users\\redma\\Games\\Age of Empires 2 DE\\76561198382316787\\resources\\_common\\scenario\\7v1 Orrax Maselia Hard Assault V4.0.2.BUILD.aoe2scenario"
+output_path = "C:\\Users\\redma\\Games\\Age of Empires 2 DE\\76561198382316787\\resources\\_common\\scenario\\7v1 Orrax Maselia Hard Assault V4.0.3 BETA.aoe2scenario"
 
 
 
 # Lecture et écriture du scénario
 scenario = AoE2DEScenario.from_file(input_path)
 trigger_manager = scenario.trigger_manager
-fonction_remove = 1
+fonction_remove = 0
 # Accéder au gestionnaire de carte
 map_manager = scenario.map_manager
 
@@ -113,7 +127,27 @@ Header = trigger_manager.add_trigger( #Start of the plugin
         )
 scenario_uuid = scenario.uuid
 area = Area.from_uuid(scenario_uuid)
+################################################ Special rule############################
+timer_quantity_1 = 5
+Script_rule = "void rule_for_friendly_fire() {"
+for p in range (1,8):
+    player=Liste_joueur[p]
+    Script_rule +=f"xsEffectAmount(cSetAttribute, 900, 44, 4, {player});"
+    Script_rule += f"xsEffectAmount(cSetAttribute, 936, 44, 4, {player});"
+    Script_rule += f"xsEffectAmount(cSetAttribute, 944, 44, 4, {player});"
+Script_rule += "}"
 
+Balancing = trigger_manager.add_trigger(
+            name=f"Equilibrage archer et cannonier",
+            enabled=True,
+            looping=False,
+)
+Balancing.new_condition.timer(
+    timer=timer_quantity_1,
+)
+Balancing.new_effect.script_call(
+    message=Script_rule,
+)
 ################################################# RELIC tech ##############################
 for u in range (1,8):
         quantity_number_1 = 1
@@ -307,16 +341,16 @@ for u in range (1,6):
         maxi_boucle = 9
     elif u == 2:
         min_boucle = 9
-        maxi_boucle = 16
+        maxi_boucle = 17
     elif u == 3:
-        min_boucle = 16
-        maxi_boucle = 23
+        min_boucle = 17
+        maxi_boucle = 24
     elif u == 4:
-        min_boucle = 23
-        maxi_boucle = 31
+        min_boucle = 24
+        maxi_boucle = 32
     else:
-        min_boucle = 31
-        maxi_boucle = 37
+        min_boucle = 32
+        maxi_boucle = 38
     for p in range (1,8):
         player = Liste_joueur[p]
         Les_tech[u] = trigger_manager.add_trigger(  # End of the plugin
@@ -390,7 +424,6 @@ for u in range (1,6):
                 resource_2_quantity=technology_cost_icon[s][quantity_number_4],
                 resource_3_quantity=technology_cost_icon[s][quantity_number_6],
 #----------------- Resource non utilisée pour limiter l'upgrade
-
             )
             Les_tech[u].new_effect.change_technology_icon(
                 source_player=player,
@@ -570,11 +603,11 @@ for u in range (1,6):
                 source_player=player,
                 attribute=Attribute.UNUSED_RESOURCE_008,
             )
-            if s not in [35,36]:
+            if s not in [36,37]:
                 check_tech[y].new_effect.script_call(
                     message=Script_XS,
                 )
-            elif s == 35:
+            elif s == 36:
                 check_tech[y].new_effect.modify_resource(
                     tribute_list=Attribute.POPULATION_HEADROOM,
                     source_player=player,
@@ -642,32 +675,80 @@ for p in range (1,8):
 #
 #
 #
-#                                                                   Séparation, la suite c'est le TRADE WORKSHOP
-#                                                                   Separation, next part is the TRADE WORKSHOP
+#                                                                   Séparation, la suite c'est le Attribution ressource
 #
 #
 #
 #
 #
 ###########################################################################################################################################################################################################################################
+#---------------------------- ATTRIBUTION DES RESSOURCES POUR LES TECHNOLOGIES
 
-for p in range (1,8):
-    player=Liste_joueur[p]
-    quantity_number_1 = 4
-    quantity_number_2 = 2
-    quantity_number_3 = 3
-    attribution_resource_pour_tech = trigger_manager.add_trigger(
-        name=f"Attribution des resources pour tech {player}",
-        enabled=True,
-        looping=False,
-    )
-    for y in range (1,37):
-        attribution_resource_pour_tech.new_effect.modify_resource(
-            tribute_list=technology_cost_icon[y][quantity_number_1],
-            source_player=player,
-            quantity=quantity_number_3,
-            operation=Operation.SET,
+for chinese_check in range (1,3):
+    for p in range (1,8):
+        if chinese_check == 1:
+            true_false = True
+            quantity_number_3 = 6
+            quantity_number_1_real = 2
+        else:
+            true_false = False
+            quantity_number_3 = 3
+            quantity_number_1_real = 1
+        player=Liste_joueur[p]
+        color=Lister_couleur[p]
+        quantity_number_1 = 4
+        quantity_number_2 = 2
+
+
+        quantity_number_2250 = 2250
+        attribution_resource_pour_tech = trigger_manager.add_trigger(
+            name=f"Attribution des resources pour tech {player}",
+            enabled=True,
+            looping=False,
         )
+        attribution_resource_pour_tech.new_condition.technology_state(
+            source_player=player,
+            technology=TechInfo.CHINESE.ID,
+            quantity=TechnologyState.DONE,
+            inverted=true_false,
+        )
+        for y in range (1,38):
+            attribution_resource_pour_tech.new_effect.modify_resource(
+                tribute_list=technology_cost_icon[y][quantity_number_1],
+                source_player=player,
+                quantity=quantity_number_3,
+                operation=Operation.SET,
+            )
+        attribution_resource_pour_tech_2250 = trigger_manager.add_trigger(
+            name=f"Attribution des resources pour tech {player}",
+            enabled=True,
+            looping=False,
+        )
+        attribution_resource_pour_tech_2250.new_condition.accumulate_attribute(
+            source_player=player,
+            attribute=Attribute.UNITS_KILLED,
+            quantity= quantity_number_2250,
+        )
+        attribution_resource_pour_tech_2250.new_condition.technology_state(
+            source_player=player,
+            technology=TechInfo.CHINESE.ID,
+            quantity=TechnologyState.DONE,
+            inverted=true_false,
+        )
+        attribution_resource_pour_tech_2250.new_effect.display_instructions(
+            object_list_unit_id=UnitInfo.MONK.ID,
+            instruction_panel_position=quantity_number_2,
+            message=f"<{color}>Player {player} has reached 2250 kill ! Reward: All the tech at the wonder can be researched a fourth time !",
+            sound_name="Play_m2i"
+        )
+        for m in range(1, 38):
+            attribution_resource_pour_tech_2250.new_effect.modify_resource(
+                tribute_list=technology_cost_icon[m][quantity_number_1],
+                source_player=player,
+                quantity=quantity_number_1_real,
+                operation=Operation.ADD,
+            )
+    #---------------------------- ATTRIBUTION DES RESSOURCES POUR LES TECHNOLOGIES
 for p in range (1,8):
     player =Liste_joueur[p]
     quantity_number_1 = 1
@@ -690,6 +771,20 @@ for p in range (1,8):
         quantity=quantity_number_1,
         operation=Operation.SET,
     )
+###########################################################################################################################################################################################################################################
+#
+#
+#
+#
+#
+#                                                                   Séparation, la suite c'est le TRADE WORKSHOP
+#                                                                   Separation, next part is the TRADE WORKSHOP
+#
+#
+#
+#
+#
+###########################################################################################################################################################################################################################################
 quantity_number_20 = 20
 quantity_number_19 = 19
 quantity_number_1000 = 1000
@@ -790,7 +885,23 @@ for p in range (1,8):
         operation=Operation.ADD,
         source_player=player,
         tribute_list=Attribute.UNUSED_RESOURCE_120,
-    )
+)
+timer_quantity = 80 #570
+timer_quantity_2= 20
+Trade_workshop_unlock_dialog = trigger_manager.add_trigger(
+        name=f"Trade workshop unlock",
+        enabled = True,
+)
+Trade_workshop_unlock_dialog.new_condition.timer(
+    timer=timer_quantity,
+)
+Trade_workshop_unlock_dialog.new_effect.display_instructions(
+        message="The trade workshop is unlocked, building it will allow you to exchange resources for points, you can build with your villager",
+        display_time=timer_quantity_2,
+        object_list_unit_id=UnitInfo.MERCHANT.ID,
+        sound_name="Play_71714",
+)
+
 for p in range (1,8):
     display_obj_result = display_obj - p
     player = Liste_joueur[p]
@@ -808,103 +919,128 @@ for p in range (1,8):
     affichage.short_description = str(f"P{player}: <Units Killed, {player}> | <Unused Resource 120, {player}> | <Unused Resource 122, {player}>/1 | ")
     affichage.display_on_screen = True
     affichage.description_order = display_obj_result
+for chinese_check in range (1,4):
+    for p in range (1,8):
+        if chinese_check == 1: # Toute les civ sauf china
+            true_false = True
+            Age_tech = None
+        elif chinese_check == 2: # china et dark age
+            true_false = False
+            Age_tech = TechInfo.DARK_AGE.ID
+        else: #China et pas dark age
+            true_false= False
+            Age_tech = TechInfo.FEUDAL_AGE.ID
 
-for p in range (1,8):
-    player=Liste_joueur[p]
-    timer_quantity = 15 #570
-    timer_quantity_2= 40 # Texte de présentation du trade workshop
-    timer_quantity_3 = timer_quantity + 10
-    button_location_number = 13
-    quantity_number_200 = 200
-    activation_trade_workshop = trigger_manager.add_trigger(
-        name=f"Trade workshop enabling {player}",
-        enabled=True,
-        looping=False,
-    )
-    activation_trade_workshop.new_condition.timer(
-        timer= timer_quantity,
-    )
-    activation_trade_workshop.new_effect.enable_disable_object(
-        source_player=player,
-        object_list_unit_id=BuildingInfo.TRADE_WORKSHOP.ID,
-        enabled=True,
-    )
-    activation_trade_workshop.new_effect.display_instructions(
-        message="The trade workshop is unlocked, building it will allow you to exchange resources for points, you can build with your villager",
-        display_time=timer_quantity_2,
-        object_list_unit_id=UnitInfo.MERCHANT.ID,
-    )
-    activation_trade_workshop.new_effect.modify_attribute(
-        source_player=player,
-        object_attributes=ObjectAttribute.WORK_RATE,
-        object_list_unit_id=BuildingInfo.TRADE_WORKSHOP.ID,
-        quantity=quantity_number_200,
-        operation=Operation.SET
-    )
-    activation_trade_workshop.new_effect.change_object_description(
-        source_player=player,
-        object_list_unit_id=BuildingInfo.TRADE_WORKSHOP.ID,
-        message="Build the Trade workshop <cost>\n Allow you to exchange points for resource, you receive a point every 3 minutes and 30 seconds\n upgrading the trade workshop will reduce this time..."
-    )
-    for vill in range (1,3):
-        if vill == 1:
-            villageois = UnitInfo.VILLAGER_MALE.ID
-        else:
-            villageois = UnitInfo.VILLAGER_FEMALE.ID
-        activation_trade_workshop.new_effect.change_train_location(
-            object_list_unit_id=BuildingInfo.TRADE_WORKSHOP.ID,
-            source_player=player,
-            button_location=button_location_number,
-            object_list_unit_id_2=villageois,
+        player=Liste_joueur[p]
+        timer_quantity = 80 #570
+        timer_quantity_2= 20 # Texte de présentation du trade workshop
+        timer_quantity_3 = timer_quantity + 10
+        button_location_number = 13
+        quantity_number_200 = 200
+        activation_trade_workshop = trigger_manager.add_trigger(
+            name=f"Trade workshop enabling {player}",
+            enabled=True,
+            looping=False,
         )
-    for t in range (1,6):
-        quantity_number_0 = 0
-        quantity_number_1 = 1
-        quantity_number_2 = 2
-        quantity_number_5000 = 5000
-        quantity_number_3 = 3
-        tech_id=Trade_workshop_placeholder_tech[t][quantity_number_0]
-        if t == 5:
-            button_location_number = 15
-        else:
-            button_location_number = t
-        activation_trade_workshop.new_effect.enable_disable_technology(
-            technology=tech_id,
+        activation_trade_workshop.new_condition.technology_state(
+            quantity=TechnologyState.DONE,
+            technology=TechInfo.CHINESE.ID,
+            inverted=true_false,
             source_player=player,
+        )
+        if chinese_check != 1:
+            activation_trade_workshop.new_condition.technology_state(
+                quantity=TechnologyState.DONE,
+                technology=Age_tech,
+                inverted=False,
+                source_player=player,
+            )
+        activation_trade_workshop.new_condition.timer(
+            timer= timer_quantity,
+        )
+        activation_trade_workshop.new_effect.enable_disable_object(
+            source_player=player,
+            object_list_unit_id=BuildingInfo.TRADE_WORKSHOP.ID,
             enabled=True,
         )
-        activation_trade_workshop.new_effect.change_technology_location(
-            technology=tech_id,
+        activation_trade_workshop.new_effect.modify_attribute(
             source_player=player,
-            object_list_unit_id_2=BuildingInfo.TRADE_WORKSHOP.ID,
-            button_location=button_location_number,
+            object_attributes=ObjectAttribute.WORK_RATE,
+            object_list_unit_id=BuildingInfo.TRADE_WORKSHOP.ID,
+            quantity=quantity_number_200,
+            operation=Operation.SET
         )
-        activation_trade_workshop.new_effect.change_technology_description(
-            message=Trade_workshop_placeholder_tech[t][quantity_number_1],
-            technology=tech_id,
+        activation_trade_workshop.new_effect.change_object_description(
             source_player=player,
+            object_list_unit_id=BuildingInfo.TRADE_WORKSHOP.ID,
+            message="Build the Trade workshop <cost>\n Allow you to exchange points for resource, you receive a point every 3 minutes and 30 seconds\n upgrading the trade workshop will reduce this time..."
         )
-        activation_trade_workshop.new_effect.change_technology_icon(
-            technology=tech_id,
-            source_player=player,
-            quantity=Trade_workshop_placeholder_tech[t][quantity_number_2],
-        )
-        if t != 5:
-            activation_trade_workshop.new_effect.change_technology_cost(
+        for vill in range (1,3):
+            if vill == 1:
+                villageois = UnitInfo.VILLAGER_MALE.ID
+            else:
+                villageois = UnitInfo.VILLAGER_FEMALE.ID
+            activation_trade_workshop.new_effect.change_train_location(
+                object_list_unit_id=BuildingInfo.TRADE_WORKSHOP.ID,
                 source_player=player,
-                resource_1=Attribute.UNUSED_RESOURCE_120,
-                resource_1_quantity=quantity_number_1,
-                technology=tech_id
+                button_location=button_location_number,
+                object_list_unit_id_2=villageois,
             )
-        else:
-            activation_trade_workshop.new_effect.change_technology_cost(
+        for t in range (1,6):
+            quantity_number_0 = 0
+            quantity_number_1 = 1
+            quantity_number_2 = 2
+            quantity_number_1200 = 1200
+            quantity_number_3 = 3
+            tech_id=Trade_workshop_placeholder_tech[t][quantity_number_0]
+            if t == 5:
+                button_location_number = 15
+            else:
+                button_location_number = t
+            activation_trade_workshop.new_effect.enable_disable_technology(
                 technology=tech_id,
                 source_player=player,
-                resource_1_quantity= quantity_number_5000,
-                resource_1= quantity_number_1,
-                resource_2_quantity=quantity_number_5000,
-                resource_3_quantity=quantity_number_3,
+                enabled=True,
             )
+            activation_trade_workshop.new_effect.change_technology_location(
+                technology=tech_id,
+                source_player=player,
+                object_list_unit_id_2=BuildingInfo.TRADE_WORKSHOP.ID,
+                button_location=button_location_number,
+            )
+            activation_trade_workshop.new_effect.change_technology_description(
+                message=Trade_workshop_placeholder_tech[t][quantity_number_1],
+                technology=tech_id,
+                source_player=player,
+            )
+            activation_trade_workshop.new_effect.change_technology_icon(
+                technology=tech_id,
+                source_player=player,
+                quantity=Trade_workshop_placeholder_tech[t][quantity_number_2],
+            )
+            if t != 5 and chinese_check != 3:
+                activation_trade_workshop.new_effect.change_technology_cost(
+                    source_player=player,
+                    resource_1=Attribute.UNUSED_RESOURCE_120,
+                    resource_1_quantity=quantity_number_1,
+                    technology=tech_id
+                )
+            elif t != 5 and chinese_check == 3:
+                activation_trade_workshop.new_effect.change_technology_cost(
+                    source_player=player,
+                    resource_1=Attribute.UNUSED_RESOURCE_120,
+                    resource_1_quantity=quantity_number_2,
+                    technology=tech_id
+                )
+            else:
+                activation_trade_workshop.new_effect.change_technology_cost(
+                    technology=tech_id,
+                    source_player=player,
+                    resource_1_quantity= quantity_number_1200,
+                    resource_1= quantity_number_1,
+                    resource_2_quantity=quantity_number_1200,
+                    #resource_3_quantity=quantity_number_3,
+                )
 for p in range (1,8):
     for t in range (1,25):
         player =Liste_joueur[p]
@@ -917,7 +1053,6 @@ for p in range (1,8):
         quantity_number_6 = 6
         technology_name = Trigger_Trade_workshop[t][quantity_number_0]
         trigger_name = Trigger_Trade_workshop[t][quantity_number_0].format(player=player)
-        trigger_name_2 = Trigger_Trade_workshop_upgrade
         exchange_ticket_for_res = trigger_manager.add_trigger(
             name=trigger_name,
             enabled=True,
@@ -951,6 +1086,8 @@ for p in range (1,8):
             enabled=True,
         )
         # Instead of using the dictionary directly, extract the text
+
+
 for p in range (1,8):
     player = Liste_joueur[p]
     for y in range (1,6):
@@ -1041,6 +1178,7 @@ for p in range (1,8):
                 upgrade_station.new_effect.enable_disable_technology(
                     technology=Trade_workshop_upgrade_msg[h][quantity_number_0],
                     enabled=True,
+                    source_player=player,
                 )
                 if h == quantity_number_10:
                     trigger_remove_first = f"3 minutes and 30 seconds timer for res{player}"
@@ -1070,7 +1208,18 @@ for p in range (1,8):
             operation=Operation.SET,
             source_player=player,
         )
-
+#################################################################################################################################################################
+#
+#
+#
+#
+#                                                                               FIN DE TRADE WORKSHOP
+#                                                                           SUITE, TECHNOLOGIE DU DEMON
+#
+#
+#
+#
+#################################################################################################################################################################
 for p in range (1,8):
     player = Liste_joueur[p]
     quantity_number_624 = 624
@@ -1137,6 +1286,7 @@ for p in range (1,8):
         quantity_number_10 = 10
         quantity_number_11 = 11
         quantity_number_14 = 14
+        quantity_number_16417 = 16417
         timer_1s = 1
         timer_7s = 7
         player=Liste_joueur[p]
@@ -1168,6 +1318,13 @@ for p in range (1,8):
             object_list_unit_id=Demon_tech[DT][quantity_number_3],
             object_list_unit_id_2=BuildingInfo.TOWN_CENTER.ID,
             button_location=quantity_number_14,
+        )
+        Tech_du_demon.new_effect.modify_attribute(
+            source_player=player,
+            object_list_unit_id=Demon_tech[DT][quantity_number_3],
+            object_attributes=ObjectAttribute.HOTKEY_ID,
+            operation=Operation.SET,
+            quantity=quantity_number_16417,
         )
 
         Tech_du_demon.new_effect.change_object_cost(
@@ -1259,6 +1416,18 @@ for p in range (1,8):
                 object_list_unit_id_2=BuildingInfo.TOWN_CENTER_PACKED.ID,
                 **area.select_entire_map().to_dict(),
             )
+            for tech in range (1,6):
+                ID_Value = tech + 5
+                if ID_Value != 10:
+                    tech_enum = getattr(TechInfo, f"TECHNOLOGY_PLACEHOLDER_0{ID_Value}")
+                else:
+                    tech_enum = getattr(TechInfo, f"TECHNOLOGY_PLACEHOLDER_{ID_Value}")
+                tech_obj = tech_enum.ID
+                Tech_du_demon_action.new_effect.enable_disable_technology(
+                    source_player=player,
+                    technology=tech_obj,
+                    enabled=True,
+                )
             Tech_du_demon_action.new_effect.remove_object(
                 source_player=player,
                 object_list_unit_id=HeroInfo.ZAWISZA_THE_BLACK.ID,
@@ -1431,7 +1600,7 @@ for p in range (1,8):
                 villager_job = [UnitInfo.VILLAGER_MALE_FARMER, UnitInfo.VILLAGER_MALE_HUNTER,
                                 UnitInfo.VILLAGER_MALE_BUILDER, UnitInfo.VILLAGER_MALE_STONE_MINER,
                                 UnitInfo.VILLAGER_MALE_GOLD_MINER, UnitInfo.VILLAGER_MALE_FISHERMAN,
-                                UnitInfo.VILLAGER_MALE_LUMBERJACK, UnitInfo.VILLAGER_MALE_REPAIRER]
+                                UnitInfo.VILLAGER_MALE_LUMBERJACK, UnitInfo.VILLAGER_MALE_REPAIRER,UnitInfo.VILLAGER_MALE_FORAGER]
                 villager_job_2 = [
                                     UnitInfo.VILLAGER_FEMALE_FARMER,
                                     UnitInfo.VILLAGER_FEMALE_HUNTER,
@@ -1440,7 +1609,8 @@ for p in range (1,8):
                                     UnitInfo.VILLAGER_FEMALE_GOLD_MINER,
                                     UnitInfo.VILLAGER_FEMALE_FISHERMAN,
                                     UnitInfo.VILLAGER_FEMALE_LUMBERJACK,
-                                    UnitInfo.VILLAGER_FEMALE_REPAIRER
+                                    UnitInfo.VILLAGER_FEMALE_REPAIRER,
+                                    UnitInfo.VILLAGER_FEMALE_FORAGER
                                 ]
                 First_print = villager_job[vill]
                 print(f"For Male worker I have the value {First_print}")
@@ -1533,6 +1703,7 @@ for p in range (1,8):
                 quantity_number_3 = 3
                 Tech_du_demon_imperial_B.new_effect.modify_attribute(
                     object_list_unit_id=commercial_unit[i],
+                    source_player=player,
                     object_attributes=ObjectAttribute.WORK_RATE,
                     quantity=quantity_number_3,
                     operation=Operation.MULTIPLY,
@@ -1618,31 +1789,36 @@ for p in range (1,8):
         )
         if Food_value:
             kill_reward.new_effect.tribute(
-                source_player=player,
+                source_player=PlayerId.GAIA,
+                target_player=player,
                 tribute_list=Attribute.FOOD_STORAGE,
                 quantity= Kill_reward[quantity_number_2][x],
             )
         if wood_value:
             kill_reward.new_effect.tribute(
-                source_player=player,
+                source_player=PlayerId.GAIA,
+                target_player=player,
                 tribute_list=Attribute.WOOD_STORAGE,
                 quantity=Kill_reward[quantity_number_3][x],
             )
         if stone_value:
             kill_reward.new_effect.tribute(
-                source_player=player,
+                source_player=PlayerId.GAIA,
+                target_player=player,
                 tribute_list=Attribute.STONE_STORAGE,
                 quantity=Kill_reward[quantity_number_4][x],
             )
         if gold_value:
             kill_reward.new_effect.tribute(
-                source_player=player,
+                source_player=PlayerId.GAIA,
+                target_player=player,
                 tribute_list=Attribute.GOLD_STORAGE,
                 quantity=Kill_reward[quantity_number_5][x],
             )
         if tickets_value:
             kill_reward.new_effect.tribute(
-                source_player=player,
+                source_player=PlayerId.GAIA,
+                target_player=player,
                 tribute_list=Attribute.UNUSED_RESOURCE_120,
                 quantity=Kill_reward[quantity_number_6][x],
             )
@@ -1662,6 +1838,325 @@ for p in range (1,8):
             quantity=quantity_number_1,
             operation=Operation.SET,
         )
+for p in range (1,8):
+    quantity_number_8 = 8
+    quantity_number_0 = 0
+    quantity_number_1 = 1
+    quantity_number_2 = 2
+    quantity_number_3 = 3
+    quantity_number_4 = 4
+    quantity_number_5 = 5
+    player = Liste_joueur[p]
+    for tech in range (1,6):
+        ID_Value = tech + 5
+        if ID_Value != 10:
+            tech_enum = getattr(TechInfo, f"TECHNOLOGY_PLACEHOLDER_0{ID_Value}")
+        else:
+            tech_enum = getattr(TechInfo, f"TECHNOLOGY_PLACEHOLDER_{ID_Value}")
+        tech_obj = tech_enum.ID
+        tower_id = [BuildingInfo.WATCH_TOWER.ID,BuildingInfo.GUARD_TOWER.ID,BuildingInfo.DONJON.ID,BuildingInfo.KEEP.ID]
+        techno_tower = trigger_manager.add_trigger(
+            name=f"Technologie {tech_obj} for player {player}",
+            enabled=True,
+            looping=False,
+        )
+        techno_tower.new_condition.research_technology(
+            source_player=player,
+            technology=tech_obj,
+        )
+        for i in range(len(tower_id)):
+            print(f"Tech={tech}, i={i}, attr0={Tower_upgrade_stat[tech][0]}, attr1={Tower_upgrade_stat[tech][1]}, attr2={Tower_upgrade_stat[tech][2]}")
+            if tech ==2:
+                techno_tower.new_effect.modify_attribute(
+                    source_player=player,
+                    object_list_unit_id=tower_id[i],
+                    armour_attack_class=quantity_number_3,
+                    object_attributes=Tower_upgrade_stat[tech][quantity_number_0],
+                    armour_attack_quantity=Tower_upgrade_stat[tech][quantity_number_1],
+                    operation=Tower_upgrade_stat[tech][quantity_number_2],
+                )
+            elif tech == 3:
+                techno_tower.new_effect.modify_attribute(
+                    source_player=player,
+                    object_list_unit_id=tower_id[i],
+                    object_attributes=Tower_upgrade_stat[tech][quantity_number_0],
+                    quantity=Tower_upgrade_stat[tech][quantity_number_1],
+                    operation=Tower_upgrade_stat[tech][quantity_number_2],
+                )
+                techno_tower.new_effect.modify_attribute(
+                    source_player=player,
+                    object_list_unit_id=tower_id[i],
+                    object_attributes=Tower_upgrade_stat[tech][quantity_number_3],
+                    quantity=Tower_upgrade_stat[tech][quantity_number_4],
+                    operation=Tower_upgrade_stat[tech][quantity_number_5],
+                )
+            else:
+                techno_tower.new_effect.modify_attribute(
+                    source_player=player,
+                    object_list_unit_id=tower_id[i],
+                    object_attributes=Tower_upgrade_stat[tech][quantity_number_0],
+                    quantity=Tower_upgrade_stat[tech][quantity_number_1],
+                    operation=Tower_upgrade_stat[tech][quantity_number_2],
+                )
+
+        techno_tower_stat = trigger_manager.add_trigger(
+            name=f"Technologie {tech_obj} for player {player}",
+            enabled=True,
+            looping=False,
+        )
+        bouton_placement = 10 + tech
+        techno_tower_stat.new_effect.change_technology_location(
+            source_player=player,
+            object_list_unit_id_2=BuildingInfo.BLACKSMITH.ID,
+            technology=tech_obj,
+            button_location=bouton_placement,
+        )
+        techno_tower_stat.new_effect.change_technology_cost(
+            source_player=player,
+            technology=tech_obj,
+            resource_1=Tower_upgrade_cost_desc[tech][quantity_number_0],
+            resource_1_quantity=Tower_upgrade_cost_desc[tech][quantity_number_1],
+            resource_2=Tower_upgrade_cost_desc[tech][quantity_number_2],
+            resource_2_quantity=Tower_upgrade_cost_desc[tech][quantity_number_3],
+        )
+        techno_tower_stat.new_effect.change_technology_description(
+            source_player=player,
+            technology=tech_obj,
+            message=Tower_upgrade_cost_desc[tech][quantity_number_4],
+        )
+        techno_tower_stat.new_effect.change_technology_research_time(
+            source_player=player,
+            technology=tech_obj,
+            quantity=quantity_number_2,
+
+        )
+        techno_tower_stat.new_effect.change_technology_icon(
+            source_player=player,
+            technology=tech_obj,
+            quantity=Tower_upgrade_cost_desc[tech][quantity_number_5],
+        )
+for p in range (1,8):
+    player = Liste_joueur[p]
+    timer_5s = 5
+    quantity_number_1 = 1
+    quantity_number_5 = 5
+    armour_class_melee = 4
+    cobra_car_att = trigger_manager.add_trigger(
+        name=f"cobra car stat for player {player}"
+    )
+    cobra_car_att.new_condition.timer(
+        timer=timer_5s,
+    )
+    cobra_car_att.new_effect.modify_attribute(
+        source_player=player,
+        quantity=quantity_number_1,
+        object_attributes=ObjectAttribute.ATTACK_RELOAD_TIME,
+        object_list_unit_id=UnitInfo.COBRA_CAR.ID,
+        operation=Operation.SET,
+    )
+    cobra_car_att.new_effect.modify_attribute(
+        source_player=player,
+        quantity=quantity_number_1,
+        object_attributes=ObjectAttribute.MOVEMENT_SPEED,
+        object_list_unit_id=UnitInfo.COBRA_CAR.ID,
+        operation=Operation.SET,
+    )
+    cobra_car_att.new_effect.modify_attribute(
+        source_player=player,
+        armour_attack_class= armour_class_melee,
+        armour_attack_quantity= quantity_number_5,
+        object_attributes=ObjectAttribute.ATTACK,
+        object_list_unit_id=UnitInfo.COBRA_CAR.ID,
+        operation=Operation.SET,
+    )
+
+for p in range (1,8):
+    player = Liste_joueur[p]
+    button_placement = 10
+    quantity_number_0 = 0
+    quantity_number_1 = 1
+    quantity_number_295 = 295
+    food = Attribute.FOOD_STORAGE
+    stone = Attribute.STONE_STORAGE
+    Unused_resource_136 = Attribute.UNUSED_RESOURCE_136
+    food_quantity = 15000
+    stone_quantity = 15000
+    timer_potion = 1800
+    special_res_quantity=1
+### Toute cette partie fait le enable de la potion qui est le héro ENVOY dans la merveille
+    potion = trigger_manager.add_trigger(
+        name =f"enable Potion for player {player}",
+        enabled=True,
+        looping=False,
+    )
+    potion.new_effect.enable_disable_object(
+        source_player=player,
+        object_list_unit_id=HeroInfo.ENVOY.ID,
+        enabled=True,
+    )
+    potion.new_effect.change_train_location(
+        source_player=player,
+        object_list_unit_id=HeroInfo.ENVOY.ID,
+        object_list_unit_id_2=BuildingInfo.WONDER.ID,
+        button_location=button_placement,
+    )
+    potion.new_effect.modify_attribute(
+        source_player=player,
+        object_list_unit_id=HeroInfo.ENVOY.ID,
+        quantity=quantity_number_295,
+        object_attributes=ObjectAttribute.ICON_ID,
+    )
+    potion.new_effect.modify_attribute(
+        source_player=player,
+        object_list_unit_id=HeroInfo.ENVOY.ID,
+        quantity=quantity_number_0,
+        object_attributes=ObjectAttribute.OBJECT_NAME_ID,
+        message="The holy potion of steroid"
+    )
+    potion.new_effect.change_object_cost(
+        source_player=player,
+        object_list_unit_id=HeroInfo.ENVOY.ID,
+        # RES TYPE
+        resource_1=Attribute.FOOD_STORAGE,
+        resource_2=Attribute.STONE_STORAGE,
+        resource_3=Unused_resource_136,
+        # quantity
+        resource_1_quantity=food_quantity,
+        resource_2_quantity=stone_quantity,
+        resource_3_quantity=special_res_quantity,
+    )
+    potion.new_effect.change_object_description(
+        source_player=player,
+        object_list_unit_id=HeroInfo.ENVOY.ID,
+        message="Use the holy potion of steroid <cost> \n Your troops drink this sacred beverage, they gain +10 armor and attacks and +150 HP for 30 minutes.\n You will not be able to re-used the potion while your troops are under the effect"
+    )
+    potion.new_effect.modify_resource(
+        source_player=player,
+        tribute_list=Unused_resource_136,
+        quantity=quantity_number_1,
+        operation=Operation.SET,
+    )
+#Script des effet et inversement
+    #Effet de potion positif
+    script_potion = f"void potion_effect_{player}()"
+    script_potion += "{"
+    #Armure melee
+    script_potion += f"xsEffectAmount(cAddAttribute, 906, cArmor, 4*256 + 10, {player});" # INFANTRY
+    script_potion += f"xsEffectAmount(cAddAttribute, 912, cArmor, 4*256 + 10, {player});" # CAVALRY
+    script_potion += f"xsEffectAmount(cAddAttribute, 900, cArmor, 4*256 + 10, {player});" # ARCHER
+    script_potion += f"xsEffectAmount(cAddAttribute, 936, cArmor, 4*256 + 10, {player});" # CAV ARCHER
+    script_potion += f"xsEffectAmount(cAddAttribute, 944, cArmor, 4*256 + 10, {player});" # Canonier
+    script_potion += f"xsEffectAmount(cAddAttribute, 913, cArmor, 4*256 + 10, {player});" # Mangonel et belier
+    script_potion += f"xsEffectAmount(cAddAttribute, 955, cArmor, 4*256 + 10, {player});" # # Scorpion
+    #Armure range
+    script_potion += f"xsEffectAmount(cAddAttribute, 906, cArmor, 3*256 + 10, {player});"  # INFANTRY
+    script_potion += f"xsEffectAmount(cAddAttribute, 912, cArmor, 3*256 + 10, {player});"  # CAVALRY
+    script_potion += f"xsEffectAmount(cAddAttribute, 900, cArmor, 3*256 + 10, {player});"  # ARCHER
+    script_potion += f"xsEffectAmount(cAddAttribute, 936, cArmor, 3*256 + 10, {player});"  # CAV ARCHER
+    script_potion += f"xsEffectAmount(cAddAttribute, 944, cArmor, 3*256 + 10, {player});"   #Canonier
+    script_potion += f"xsEffectAmount(cAddAttribute, 913, cArmor, 3*256 + 10, {player});"  # Mangonel et belier
+    script_potion += f"xsEffectAmount(cAddAttribute, 955, cArmor, 3*256 + 10, {player});"  # # Scorpion
+    #PV
+    script_potion += f"xsEffectAmount(cAddAttribute, 906, 0, 150, {player});"  # INFANTRY
+    script_potion += f"xsEffectAmount(cAddAttribute, 912, 0, 150, {player});"  # CAVALRY
+    script_potion += f"xsEffectAmount(cAddAttribute, 900, 0, 150, {player});"  # ARCHER
+    script_potion += f"xsEffectAmount(cAddAttribute, 936, 0, 150, {player});"  # CAV ARCHER
+    script_potion += f"xsEffectAmount(cAddAttribute, 944, 0, 150, {player});"  # Canonier
+    script_potion += f"xsEffectAmount(cAddAttribute, 913, 0, 150, {player});"  # Mangonel et belier
+    script_potion += f"xsEffectAmount(cAddAttribute, 955, 0, 150, {player});"  # # Scorpion
+    # Attaque
+    script_potion += f"xsEffectAmount(cAddAttribute, 906, 9, 4*256 + 10, {player});"  # INFANTRY
+    script_potion += f"xsEffectAmount(cAddAttribute, 912, 9, 4*256 + 10, {player});"  # CAVALRY
+    script_potion += f"xsEffectAmount(cAddAttribute, 900, 9, 3*256 + 10, {player});"  # ARCHER
+    script_potion += f"xsEffectAmount(cAddAttribute, 936, 9, 3*256 + 10, {player});"  # CAV ARCHER
+    script_potion += f"xsEffectAmount(cAddAttribute, 944, 9, 3*256 + 10, {player});"  # Canonier
+    script_potion += f"xsEffectAmount(cAddAttribute, 913, 9, 4*256 + 10, {player});"  # Mangonel et belier
+    script_potion += f"xsEffectAmount(cAddAttribute, 955, 9, 3*256 + 10, {player});"  # # Scorpion
+    script_potion += "}"
+# EFFET INVERSE POTION
+    rev_script_potion = f"void potion_reveffect_{player}()"
+    rev_script_potion += "{"
+    # Armure melee
+    rev_script_potion += f"xsEffectAmount(cAddAttribute, 906, cArmor,-4*256-10, {player});"  # INFANTRY
+    rev_script_potion += f"xsEffectAmount(cAddAttribute, 912, cArmor,-4*256-10, {player});"  # CAVALRY
+    rev_script_potion += f"xsEffectAmount(cAddAttribute, 900, cArmor,-4*256-10, {player});"  # ARCHER
+    rev_script_potion += f"xsEffectAmount(cAddAttribute, 936, cArmor,-4*256-10, {player});"  # CAV ARCHER
+    rev_script_potion += f"xsEffectAmount(cAddAttribute, 944, cArmor,-4*256-10, {player});"  # Canonier
+    rev_script_potion += f"xsEffectAmount(cAddAttribute, 913, cArmor,-4*256-10, {player});"  # Mangonel et belier
+    rev_script_potion += f"xsEffectAmount(cAddAttribute, 955, cArmor,-4*256-10, {player});"  # # Scorpion
+    # Armure range
+    rev_script_potion += f"xsEffectAmount(cAddAttribute, 906, cArmor,-3*256-10, {player});"  # INFANTRY
+    rev_script_potion += f"xsEffectAmount(cAddAttribute, 912, cArmor,-3*256-10, {player});"  # CAVALRY
+    rev_script_potion += f"xsEffectAmount(cAddAttribute, 900, cArmor,-3*256-10, {player});"  # ARCHER
+    rev_script_potion += f"xsEffectAmount(cAddAttribute, 936, cArmor,-3*256-10, {player});"  # CAV ARCHER
+    rev_script_potion += f"xsEffectAmount(cAddAttribute, 944, cArmor,-3*256-10, {player});"  # Canonier
+    rev_script_potion += f"xsEffectAmount(cAddAttribute, 913, cArmor,-3*256-10, {player});"  # Mangonel et belier
+    rev_script_potion += f"xsEffectAmount(cAddAttribute, 955, cArmor,-3*256-10, {player});"  # # Scorpion
+    # PV
+    rev_script_potion += f"xsEffectAmount(cAddAttribute, 906, 0, -150, {player});"  # INFANTRY
+    rev_script_potion += f"xsEffectAmount(cAddAttribute, 912, 0, -150, {player});"  # CAVALRY
+    rev_script_potion += f"xsEffectAmount(cAddAttribute, 900, 0, -150, {player});"  # ARCHER
+    rev_script_potion += f"xsEffectAmount(cAddAttribute, 936, 0, -150, {player});"  # CAV ARCHER
+    rev_script_potion += f"xsEffectAmount(cAddAttribute, 944, 0, -150, {player});"  # Canonier
+    rev_script_potion += f"xsEffectAmount(cAddAttribute, 913, 0, -150, {player});"  # Mangonel et belier
+    rev_script_potion += f"xsEffectAmount(cAddAttribute, 955, 0, -150, {player});"  # # Scorpion
+    # Attaque
+    rev_script_potion += f"xsEffectAmount(cAddAttribute, 906, 9,-4*256-10, {player});"  # INFANTRY
+    rev_script_potion += f"xsEffectAmount(cAddAttribute, 912, 9,-4*256-10, {player});"  # CAVALRY
+    rev_script_potion += f"xsEffectAmount(cAddAttribute, 900, 9,-3*256-10, {player});"  # ARCHER
+    rev_script_potion += f"xsEffectAmount(cAddAttribute, 936, 9,-3*256-10, {player});"  # CAV ARCHER
+    rev_script_potion += f"xsEffectAmount(cAddAttribute, 944, 9,-3*256-10, {player});"  # Canonier
+    rev_script_potion += f"xsEffectAmount(cAddAttribute, 913, 9,-4*256-10, {player});"  # Mangonel et belier
+    rev_script_potion += f"xsEffectAmount(cAddAttribute, 955, 9,-4*256-10, {player});"  # # Scorpion
+    rev_script_potion += "}"
+
+    ### Toute fait partie va faire la detection du héro sur le terrain et activer le timer
+    potion_on_land = trigger_manager.add_trigger(
+            name =f"potion on land {player}",
+            enabled=True,
+            looping=True,
+        )
+    potion_timer = trigger_manager.add_trigger(
+        name=f"Timer effect {player}",
+        enabled=False,
+        looping=True,
+    )
+    potion_on_land.new_condition.objects_in_area(
+        source_player=player,
+        object_list=HeroInfo.ENVOY.ID,
+        **area.select_entire_map().to_dict(),
+        quantity=quantity_number_1,
+        object_state=ObjectState.ALIVE,
+    )
+    potion_on_land.new_effect.script_call(
+        message=script_potion
+    )
+    potion_on_land.new_effect.remove_object(
+        source_player=player,
+        object_list_unit_id=HeroInfo.ENVOY.ID,
+        **area.select_entire_map().to_dict(),
+        object_state=ObjectState.ALIVE,
+    )
+    trigger_remove_first = f"Timer effect {player}"
+    trigger_id_first = next((i for i, trigger in enumerate(trigger_manager.triggers) if trigger.name == trigger_remove_first), None)
+    potion_on_land.new_effect.activate_trigger(
+        trigger_id=trigger_id_first,
+    )
+    potion_timer.new_condition.timer(
+        timer=timer_potion,
+    )
+    potion_timer.new_effect.script_call(
+        message=rev_script_potion,
+    )
+    potion_timer.new_effect.modify_resource(
+        source_player=player,
+        tribute_list=Unused_resource_136,
+        quantity=quantity_number_1,
+        operation=Operation.SET,
+    )
+    potion_timer.new_effect.deactivate_trigger(
+        trigger_id=trigger_id_first,
+    )
 
 Header_end = trigger_manager.add_trigger( #End of the plugin
             name=f"-----end_Plugin------",
